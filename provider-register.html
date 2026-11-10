@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Provider Registration | Juba ServeLink</title>
+<style>
+:root{--navy:#102a43;--green:#15966b;--bg:#f3f8f6;--ink:#243b53;--muted:#627d98;--line:#d9e2ec}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+header{background:var(--navy);color:#fff;padding:17px 5%;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-weight:800;font-size:1.2rem}.brand span{color:#54d6a4}header a{color:#fff;text-decoration:none;font-weight:700}
+main{max-width:760px;margin:32px auto;padding:0 16px 40px}.intro{text-align:center;margin-bottom:22px}
+h1{color:var(--navy);margin:0 0 9px;font-size:2rem}.intro p{color:var(--muted);line-height:1.5}
+form,.notice{background:#fff;border:1px solid var(--line);border-radius:15px;padding:22px;box-shadow:0 8px 24px #102a4310}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.field{margin-bottom:15px}.full{grid-column:1/-1}
+label{display:block;font-weight:700;font-size:.93rem;margin-bottom:7px}
+input,select,textarea{width:100%;padding:12px;border:1px solid #bcccdc;border-radius:9px;font:inherit;color:var(--ink);background:#fff}
+input:focus,select:focus,textarea:focus{outline:2px solid #9ae6c8;border-color:var(--green)}
+textarea{min-height:105px;resize:vertical}.hint,.small{font-size:.82rem;color:var(--muted);line-height:1.5;margin-top:6px}
+.areas{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}.areas label{font-weight:500;display:flex;align-items:center;gap:7px;margin:0}.areas input{width:auto}
+button{width:100%;padding:14px;border:0;border-radius:9px;background:var(--green);color:white;font-size:1rem;font-weight:800;cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}.status{display:none;margin-top:15px;padding:13px;border-radius:9px;line-height:1.5}.status.show{display:block}.success{background:#e8f8f0;color:#126b48}.error{background:#fff1f0;color:#9b1c1c}
+.notice{margin-top:17px;font-size:.9rem;line-height:1.55}.notice strong{color:var(--navy)}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.areas{grid-template-columns:repeat(2,1fr)}form{padding:17px}h1{font-size:1.65rem}}
+</style>
+</head>
+<body>
+<header><div class="brand">Juba <span>ServeLink</span></div><a href="index.html">← Back to home</a></header>
+<main>
+<section class="intro"><h1>Become a Service Provider</h1><p>Tell Juba about the services you offer. Create an account and submit your provider application for review.</p></section>
+<form id="providerForm">
+<div class="grid">
+<div class="field"><label for="fullName">Full name *</label><input id="fullName" autocomplete="name" required maxlength="100" placeholder="Your full name"></div>
+<div class="field"><label for="phone">Phone number *</label><input id="phone" type="tel" autocomplete="tel" required maxlength="30" placeholder="+211..."></div>
+<div class="field"><label for="whatsapp">WhatsApp number</label><input id="whatsapp" type="tel" maxlength="30" placeholder="+211..."></div>
+<div class="field"><label for="email">Email address *</label><input id="email" type="email" autocomplete="email" required placeholder="you@example.com"></div>
+<div class="field"><label for="password">Create password *</label><input id="password" type="password" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters"><div class="hint">Use a unique password. Do not reuse your email password.</div></div>
+<div class="field"><label for="category">Service category *</label><select id="category" required><option value="">Choose your service</option><option>Electrical services</option><option>Plumbing</option><option>Automotive / Mechanics</option><option>Construction / Masonry</option><option>Painting</option><option>Carpentry</option><option>Cleaning</option><option>Delivery / Moving</option><option>Technology / Computer repair</option><option>Appliance repair</option><option>Creative services</option><option>Other services</option></select></div>
+<div class="field"><label for="experience">Years of experience</label><input id="experience" type="number" min="0" max="60" value="0"></div>
+<div class="field full"><label>Neighbourhoods you serve * (select at least one)</label><div class="areas" id="areas">
+<label><input type="checkbox" value="Munuki">Munuki</label><label><input type="checkbox" value="Gudele">Gudele</label><label><input type="checkbox" value="Jebel">Jebel</label><label><input type="checkbox" value="Kator">Kator</label><label><input type="checkbox" value="Tongpiny">Tongpiny</label><label><input type="checkbox" value="Hai Cinema">Hai Cinema</label><label><input type="checkbox" value="Custom">Custom</label><label><input type="checkbox" value="Atlabara">Atlabara</label><label><input type="checkbox" value="Shirkat">Shirkat</label><label><input type="checkbox" value="Thongpiny">Thongpiny</label><label><input type="checkbox" value="Mauna">Mauna</label><label><input type="checkbox" value="Kuwait">Kuwait</label>
+</div></div>
+<div class="field full"><label for="description">Describe your services *</label><textarea id="description" required maxlength="1000" placeholder="Describe your skills, services, and relevant experience."></textarea></div>
+</div>
+<button id="submitBtn" type="submit">Create account & submit application</button>
+<div id="status" class="status" role="status" aria-live="polite"></div>
+<p class="small">By registering, you agree that Juba ServeLink may contact you about your application. Your profile will remain pending until reviewed. Do not submit another person's information without their permission.</p>
+</form>
+<div class="notice"><strong>Please note:</strong> Registration does not mean identity or qualifications have been verified. Provider profiles will only become publicly visible after administrator approval.</div>
+</main>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL = 'https://vbsoozymvklhbnawzuea.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Szj7GC47lgvaL_hVU2ti5A_RgvbqE02';
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+const form = document.getElementById('providerForm');
+const button = document.getElementById('submitBtn');
+const statusBox = document.getElementById('status');
+
+function showStatus(message, type) {
+  statusBox.textContent = message;
+  statusBox.className = 'status show ' + type;
+}
+
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  statusBox.className = 'status';
+
+  const areas = [...document.querySelectorAll('#areas input:checked')].map(x => x.value);
+  if (!areas.length) return showStatus('Please select at least one neighbourhood.', 'error');
+
+  const experience = Number(document.getElementById('experience').value || 0);
+  if (!Number.isInteger(experience) || experience < 0 || experience > 60) {
+    return showStatus('Enter a whole number of experience years from 0 to 60.', 'error');
+  }
+
+  const profile = {
+    full_name: document.getElementById('fullName').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
+    whatsapp: document.getElementById('whatsapp').value.trim() || null,
+    service_category: document.getElementById('category').value,
+    description: document.getElementById('description').value.trim(),
+    experience_years: experience,
+    service_areas: areas,
+    status: 'pending'
+  };
+
+  button.disabled = true;
+  button.textContent = 'Submitting application...';
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email: document.getElementById('email').value.trim(),
+      password: document.getElementById('password').value,
+      options: { data: profile, emailRedirectTo: window.location.origin + window.location.pathname }
+    });
+    if (error) throw error;
+    if (!data.user) throw new Error('Account creation did not return a user. Please try again.');
+
+    if (data.session) {
+      showStatus('Your account has been created. Your provider application is submitted as PENDING review. Please keep your login details safe.', 'success');
+    } else {
+      showStatus('Your account has been created. Check your email and confirm your address. Your provider details have been saved with your account and will be added to the provider list after confirmation. If confirmation does not arrive, check your spam folder.', 'success');
+    }
+    form.reset();
+  } catch (err) {
+    showStatus(err.message || 'Registration failed. Please try again.', 'error');
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Create account & submit application';
+  }
+});
+</script>
+</body>
+</html>
