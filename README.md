@@ -20,7 +20,12 @@ Our goal is to build a convenient, accessible and trusted
 digital platform that supports local businesses, skilled workers
 and customers.
 
-https://stardev.io/developers/garango123
+[![Global Ranking](https://stardev.io/developers/garango123/badge/languages/global.svg)](https://stardev.io/developers/garango123)
+
+
+[![Country Ranking](https://stardev.io/developers/garango123/badge/languages/country.svg)](https://stardev.io/developers/garango123)
+
+
 
 ## Vision
 
